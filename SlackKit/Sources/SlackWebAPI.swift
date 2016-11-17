@@ -34,6 +34,7 @@ internal enum SlackAPIEndpoint: String {
     case ChannelsSetPurpose = "channels.setPurpose"
     case ChannelsSetTopic = "channels.setTopic"
     case ChatDelete = "chat.delete"
+    case ChatPostMeMessage = "chat.meMessage"
     case ChatPostMessage = "chat.postMessage"
     case ChatUpdate = "chat.update"
     case DNDInfo = "dnd.info"
@@ -209,6 +210,16 @@ public class SlackWebAPI {
                 success?((ts: response["ts"] as? String, response["channel"] as? String))
             }) {(error) -> Void in
                 failure?(error: error)
+        }
+    }
+    
+    public func sendMeMessage(channel: String, text: String, success: (((ts: String?, channel: String?))->Void)?, failure: FailureClosure?) {
+        let parameters: [String: Any?] = ["channel":channel, "text":text.slackFormatEscaping()]
+        networkInterface.request(endpoint: .ChatPostMeMessage, token: token, parameters: filterNilParameters(parameters: parameters), successClosure: {
+            (response) -> Void in
+            success?((ts: response["ts"] as? String, response["channel"] as? String))
+        }) {(error) -> Void in
+            failure?(error: error)
         }
     }
     
